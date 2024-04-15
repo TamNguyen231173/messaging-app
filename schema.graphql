@@ -1,21 +1,23 @@
-type User {
-  id: Int!
+# === input ===
+input RegisterInput {
   email: String
-  password String
+  password: String
   firstName: String
   lastName: String
 }
 
-input RegisterInput {
+# === type ===
+type User {
+  id: Int!
   email: String
-  password String
+  password: String
   firstName: String
   lastName: String
 }
 
 type AuthResponse {
-  user: User
-  jwt: String
+  user: User!
+  jwt: String!
 }
 
 type Mutation {
