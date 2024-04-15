@@ -3,3 +3,4 @@ documents: '/src/components/**/*.graphql,ts,js,jsx,tsx'
 extensions:
   customExtension:
     foo: true
+    

@@ -24,6 +24,12 @@ type Mutation {
   register(input: RegisterInput!): AuthResponse!
 }
 
+type Query {
+  users: [User]
+  user(id: Int!): User
+}
+
 schema {
   mutation: Mutation
+  query: Query
 }
