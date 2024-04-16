@@ -1,4 +1,5 @@
 import { AppModuleInstance } from './module'
+import 'reflect-metadata'
 
 const main = async () => {
   try {
