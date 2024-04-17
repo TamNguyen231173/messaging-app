@@ -1,18 +1,18 @@
 # === input ===
 input RegisterInput {
-  email: String
-  password: String
-  firstName: String
-  lastName: String
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
 }
 
 # === type ===
 type User {
   id: Int!
-  email: String
+  email: String!
   password: String
-  firstName: String
-  lastName: String
+  firstName: String!
+  lastName: String!
 }
 
 type AuthResponse {
