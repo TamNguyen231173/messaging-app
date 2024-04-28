@@ -5,6 +5,11 @@ input RegisterInput {
   password: String!
 }
 
+input LoginInput {
+  email: String!
+  password: String!
+}
+
 # === type ===
 type User {
   id: Int!
@@ -21,6 +26,7 @@ type AuthResponse {
 
 type Mutation {
   register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
 }
 
 type Query {

@@ -23,7 +23,14 @@ class UserService {
   }
 
   async findOneByEmail(email: string) {
-    return await this.userRepository.findOne({ where: { email } })
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne()
+
+    return user
   }
 }
 

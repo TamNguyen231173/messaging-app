@@ -2,6 +2,19 @@ import { ACCESS_TOKEN_EXPIRES_IN, JWT_SECRET, REFRESH_TOKEN_EXPIRES_IN } from '~
 import { AuthResponse, Resolvers, User } from '../__generated__/resolvers-types'
 import { userService } from './user/user.service'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
+
+function generateAccessToken(email: string, userId: number) {
+  return jwt.sign({ email, userId }, JWT_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN
+  })
+}
+
+function generateRefreshToken(email: string, userId: number) {
+  return jwt.sign({ email, userId }, JWT_SECRET, {
+    expiresIn: REFRESH_TOKEN_EXPIRES_IN
+  })
+}
 
 export const authResolvers: Resolvers = {
   Mutation: {
@@ -11,48 +24,44 @@ export const authResolvers: Resolvers = {
       if (existUser) {
         throw new Error('Email already exists')
       }
-      const user = await userService.create(input)
 
-      const accessToken = jwt.sign({ email: input.email, userId: user.id }, JWT_SECRET, {
-        expiresIn: ACCESS_TOKEN_EXPIRES_IN
-      })
-      const refreshToken = jwt.sign({ email: input.email, userId: user.id }, JWT_SECRET, {
-        expiresIn: REFRESH_TOKEN_EXPIRES_IN
-      })
+      const user = await userService.create(input)
 
       return {
         user,
-        accessToken,
-        refreshToken
+        accessToken: generateAccessToken(input.email, user.id),
+        refreshToken: generateRefreshToken(input.email, user.id)
+      }
+    },
+
+    async login(parent, { input: { email, password } }, context): Promise<AuthResponse> {
+      const user = await userService.findOneByEmail(email)
+
+      if (!user) {
+        throw new Error('Email or password is incorrect')
+      }
+
+      const valid = await bcrypt.compare(password, user.password)
+
+      if (!valid) {
+        throw new Error('Email or password is incorrect')
+      }
+
+      return {
+        user,
+        accessToken: generateAccessToken(email, user.id),
+        refreshToken: generateRefreshToken(email, user.id)
       }
     }
   },
 
   Query: {
     users: async (parent, args, context) => {
-      return [
-        {
-          id: 1,
-          username: 'user1',
-          email: 'user1@example.com',
-          password: 'password1'
-        },
-        {
-          id: 2,
-          username: 'user2',
-          email: 'user2@example.com',
-          password: 'password2'
-        }
-      ]
+      return await userService.getAllUsers()
     },
 
     user: async (parent, { id }, context) => {
-      return {
-        id: id,
-        username: 'user',
-        email: 'user@example.com',
-        password: 'password'
-      }
+      return await userService.getUserById(id)
     }
   }
 }
