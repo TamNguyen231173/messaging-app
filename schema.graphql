@@ -1,23 +1,22 @@
 # === input ===
 input RegisterInput {
+  username: String!
   email: String!
   password: String!
-  firstName: String!
-  lastName: String!
 }
 
 # === type ===
 type User {
   id: Int!
+  username: String!
   email: String!
   password: String
-  firstName: String!
-  lastName: String!
 }
 
 type AuthResponse {
   user: User!
-  jwt: String!
+  accessToken: String!
+  refreshToken: String!
 }
 
 type Mutation {

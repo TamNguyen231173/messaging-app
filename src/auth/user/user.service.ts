@@ -3,6 +3,7 @@ import { User } from './entity/user.entity'
 import { RegisterInput } from '~/__generated__/resolvers-types'
 import bcrypt from 'bcrypt'
 import { AppDataSource } from '~/app-data.source'
+import { GraphQLError } from 'graphql'
 
 class UserService {
   constructor(public userRepository: Repository<User>) {}
@@ -10,13 +11,19 @@ class UserService {
   async create(registerInput: RegisterInput) {
     const userExist = await this.userRepository.findOne({ where: { email: registerInput.email } })
     if (userExist) {
-      throw new Error('Email already exists')
+      throw new GraphQLError('Email already exists')
     }
 
     const password = await bcrypt.hash(registerInput.password, 10)
     const user = this.userRepository.create({ ...registerInput, password })
 
-    return await this.userRepository.save(user)
+    await this.userRepository.save(user)
+
+    return user
+  }
+
+  async findOneByEmail(email: string) {
+    return await this.userRepository.findOne({ where: { email } })
   }
 }
 
