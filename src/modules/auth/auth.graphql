@@ -1,0 +1,44 @@
+# === input ===
+input RegisterInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+# === type ===
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  password: String
+}
+
+type AuthResponse {
+  user: User!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type JwtPayload {
+  id: Int!
+  email: String!
+}
+
+type Mutation {
+  register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
+}
+
+type Query {
+  currentUser: JwtPayload
+}
+
+schema {
+  mutation: Mutation
+  query: Query
+}

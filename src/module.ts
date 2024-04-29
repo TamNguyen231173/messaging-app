@@ -1,14 +1,21 @@
-import { ApolloServer } from 'apollo-server-express'
+import { ApolloServer, ExpressContext } from 'apollo-server-express'
 import { readFileSync } from 'fs'
 import http from 'http'
-import { Resolvers } from './__generated__/resolvers-types'
+import { JwtPayload, Resolvers } from './__generated__/resolvers-types'
 import express from 'express'
-import { authResolvers } from './auth/auth.resolvers'
+import jwt from 'jsonwebtoken'
+import { JWT_SECRET } from './configs'
+import { authResolvers } from './modules/auth/auth.resolvers'
+
+export interface MyContext extends ExpressContext {
+  currentUser: JwtPayload
+  authorized: boolean
+}
 
 export class AppModule {
   constructor(public resolvers: Resolvers) {}
 
-  async startApollo(): Promise<{ httpServer: http.Server; server: ApolloServer }> {
+  async startApollo(): Promise<{ httpServer: http.Server; server: ApolloServer<MyContext> }> {
     const typeDefs = readFileSync('schema.graphql', 'utf-8')
 
     const app = express() as any
@@ -17,7 +24,24 @@ export class AppModule {
 
     const server = new ApolloServer({
       typeDefs,
-      resolvers: this.resolvers
+      resolvers: this.resolvers,
+      context: ({ req, res }) => {
+        if (!req.headers.authorization) {
+          return {
+            currentUser: null,
+            req,
+            authorized: false
+          }
+        }
+
+        const payload = jwt.verify(req.headers.authorization, JWT_SECRET) as JwtPayload
+
+        return {
+          currentUser: payload,
+          req,
+          authorized: !!payload
+        }
+      }
     })
 
     await server.start()

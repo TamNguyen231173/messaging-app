@@ -1,5 +1,5 @@
 import { ACCESS_TOKEN_EXPIRES_IN, JWT_SECRET, REFRESH_TOKEN_EXPIRES_IN } from '~/configs'
-import { AuthResponse, Resolvers, User } from '../__generated__/resolvers-types'
+import { AuthResponse, JwtPayload, Resolvers, User } from '../__generated__/resolvers-types'
 import { userService } from './user/user.service'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
@@ -56,12 +56,12 @@ export const authResolvers: Resolvers = {
   },
 
   Query: {
-    users: async (parent, args, context) => {
-      return await userService.getAllUsers()
-    },
+    currentUser(parent, input, context): JwtPayload {
+      if (!context.authorized) {
+        throw new Error('Unauthorized')
+      }
 
-    user: async (parent, { id }, context) => {
-      return await userService.getUserById(id)
+      return context.currentUser
     }
   }
 }
