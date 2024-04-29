@@ -6,6 +6,8 @@ import express from 'express'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET } from './configs'
 import { authResolvers } from './modules/auth/auth.resolvers'
+import { roomResolvers } from './modules/room/room.resolvers'
+import { mergeResolvers } from '@graphql-tools/merge'
 
 export interface MyContext extends ExpressContext {
   currentUser: JwtPayload
@@ -52,4 +54,4 @@ export class AppModule {
   }
 }
 
-export const AppModuleInstance = new AppModule(authResolvers)
+export const AppModuleInstance = new AppModule(mergeResolvers([authResolvers, roomResolvers]) as Resolvers)
