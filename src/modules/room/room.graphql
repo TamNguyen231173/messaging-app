@@ -6,7 +6,7 @@ type Message {
 type Room {
   id: Int!
   users: [User]
-  message: [Message]
+  messages: [Message]
 }
 
 input SendMessageInput {
@@ -17,5 +17,3 @@ input SendMessageInput {
 type Mutation {
   sendMessage(input: SendMessageInput!): Room
 }
-
-

@@ -1,5 +1,5 @@
 import { ACCESS_TOKEN_EXPIRES_IN, JWT_SECRET, REFRESH_TOKEN_EXPIRES_IN } from '~/configs'
-import { AuthResponse, JwtPayload, Resolvers, User } from '../__generated__/resolvers-types'
+import { AuthResponse, JwtPayload, Resolvers, User } from '../../__generated__/resolvers-types'
 import { userService } from './user/user.service'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'

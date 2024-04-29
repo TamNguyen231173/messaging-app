@@ -1,0 +1,60 @@
+# generated schema - do not edit #
+type Message {
+  from: Int!
+  content: String!
+}
+
+type Room {
+  id: Int!
+  users: [User]
+  messages: [Message]
+}
+
+input SendMessageInput {
+  message: String!
+  roomId: Int!
+}
+
+type Mutation {
+  sendMessage(input: SendMessageInput!): Room
+  register(input: RegisterInput!): AuthResponse!
+  login(input: LoginInput!): AuthResponse!
+}
+
+input RegisterInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  password: String
+}
+
+type AuthResponse {
+  user: User!
+  accessToken: String!
+  refreshToken: String!
+}
+
+type JwtPayload {
+  id: Int!
+  email: String!
+}
+
+type Query {
+  currentUser: JwtPayload
+}
+
+schema {
+  mutation: Mutation
+  query: Query
+}

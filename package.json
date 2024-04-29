@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "npx nodemon",
     "build": "rimraf ./dist && tsc && tsc-alias",
-    "start": "node dist/index.js",
+    "start": "npm run generate && node dist/index.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
-    "generate": "graphql-codegen --config codegen.yml --debug"
+    "generate": "node dist/generate-schema.js && graphql-codegen --config codegen.yml --debug"
   },
   "keywords": [],
   "author": "",
@@ -38,10 +38,12 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@graphql-tools/merge": "^9.0.3",
     "@types/bcrypt": "^5.0.2",
     "apollo-server-express": "^3.13.0",
     "bcrypt": "^5.1.1",
     "express": "^4.19.2",
+    "glob": "^10.3.12",
     "graphql": "^16.8.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.5",
