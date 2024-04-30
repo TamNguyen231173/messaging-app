@@ -8,10 +8,14 @@ export const roomResolvers: Resolvers = {
     async sendMessage(parent, { input }, context): Promise<Room> {
       if (!context.authorized) throw new GraphQLError('Unauthorized')
 
-      const room = await roomService.addMessageToRoom(input.roomId, {
-        from: context.currentUser.id,
-        content: input.message
-      })
+      const room = await roomService.addMessageToRoom(
+        input.roomId,
+        {
+          from: context.currentUser.id,
+          content: input.message
+        },
+        context.io
+      )
 
       return room
     },

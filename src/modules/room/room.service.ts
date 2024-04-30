@@ -3,16 +3,24 @@ import { Room } from './entity/room.entity'
 import { AppDataSource } from '~/app-data.source'
 import { User } from '../auth/user/entity/user.entity'
 import { Message } from '~/__generated__/resolvers-types'
+import { Server } from 'socket.io'
 
 class RoomService {
   constructor(private readonly roomRepository: Repository<Room>) {}
 
-  async addMessageToRoom(roomId: number, message: Message): Promise<Room> {
+  async addMessageToRoom(roomId: number, message: Message, io?: Server): Promise<Room> {
     const queryBuilder = this.roomRepository.createQueryBuilder('room')
     await queryBuilder
       .update(Room, { messages: () => `messages || '${JSON.stringify(message)}'::jsonb` })
       .where('id = :id', { id: roomId })
       .execute()
+
+    if (io) {
+      io.to(`${roomId}`).emit('message', {
+        message,
+        roomId
+      })
+    }
 
     const room = await this.roomRepository.findOne({
       where: { id: roomId },

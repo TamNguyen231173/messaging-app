@@ -4,17 +4,18 @@ import express from 'express'
 import { readFileSync } from 'fs'
 import http from 'http'
 import jwt from 'jsonwebtoken'
-import { Server } from 'socket.io'
 import { JwtPayload, Resolvers } from './__generated__/resolvers-types'
 import { AppDataSource } from './app-data.source'
-import { JWT_SECRET } from './configs'
+import { JWT_SECRET, PORT } from './configs'
 import { authResolvers } from './modules/auth/auth.resolvers'
 import { Room } from './modules/room/entity/room.entity'
 import { roomResolvers } from './modules/room/room.resolvers'
+import { Server } from 'socket.io'
 
 export interface MyContext extends ExpressContext {
   currentUser: JwtPayload
   authorized: boolean
+  io: Server
 }
 
 export class AppModule {
@@ -29,7 +30,11 @@ export class AppModule {
 
     const httpServer = http.createServer(app)
 
-    const io = new Server(httpServer)
+    const io = new Server(httpServer, {
+      cors: {
+        origin: `http://127.0.0.1:${PORT}`
+      }
+    })
 
     io.on('connection', (socket) => {
       app.request.socketIo = socket
@@ -42,6 +47,7 @@ export class AppModule {
         if (!req.headers.authorization) {
           return {
             currentUser: null,
+            io,
             req,
             authorized: false
           }
@@ -59,11 +65,12 @@ export class AppModule {
 
           const roomIds = rooms.map((room) => room.id.toString())
 
-          req.socketIo?.join(roomIds)
+          await req.socketIo?.join(roomIds)
         }
 
         return {
           currentUser: payload,
+          io,
           req,
           authorized: !!payload
         }

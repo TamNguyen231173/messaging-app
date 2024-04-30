@@ -1,3 +1,4 @@
+import { PORT } from './configs'
 import { AppModuleInstance } from './module'
 import 'reflect-metadata'
 
@@ -5,8 +6,8 @@ const main = async () => {
   try {
     const { httpServer, server } = await AppModuleInstance.startApollo()
 
-    httpServer.listen(4000, () => {
-      console.log(`Server is running on http://localhost:4000${server.graphqlPath}`)
+    httpServer.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}${server.graphqlPath}`)
     })
   } catch (error) {
     console.log(error)
