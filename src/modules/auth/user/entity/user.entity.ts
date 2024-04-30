@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm'
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm'
+import { Room } from '~/modules/room/room.entity'
 
 @Entity()
 export class User {
@@ -13,4 +14,8 @@ export class User {
 
   @Column({ select: false })
   password!: string
+
+  @ManyToMany(() => Room)
+  @Column()
+  rooms: Room[]
 }
