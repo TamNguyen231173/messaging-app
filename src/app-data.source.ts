@@ -10,5 +10,7 @@ export const AppDataSource = new DataSource({
   database: DB_DATABASE,
   entities: ['./dist/**/*.entity.js'],
   logging: false,
-  synchronize: true
+  synchronize: false,
+  migrations: ['./dist/migrations/*-migration.js'],
+  migrationsRun: true
 })
