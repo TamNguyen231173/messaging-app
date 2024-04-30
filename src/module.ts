@@ -1,13 +1,16 @@
+import { mergeResolvers } from '@graphql-tools/merge'
 import { ApolloServer, ExpressContext } from 'apollo-server-express'
+import express from 'express'
 import { readFileSync } from 'fs'
 import http from 'http'
-import { JwtPayload, Resolvers } from './__generated__/resolvers-types'
-import express from 'express'
 import jwt from 'jsonwebtoken'
+import { Server } from 'socket.io'
+import { JwtPayload, Resolvers } from './__generated__/resolvers-types'
+import { AppDataSource } from './app-data.source'
 import { JWT_SECRET } from './configs'
 import { authResolvers } from './modules/auth/auth.resolvers'
+import { Room } from './modules/room/entity/room.entity'
 import { roomResolvers } from './modules/room/room.resolvers'
-import { mergeResolvers } from '@graphql-tools/merge'
 
 export interface MyContext extends ExpressContext {
   currentUser: JwtPayload
@@ -20,14 +23,22 @@ export class AppModule {
   async startApollo(): Promise<{ httpServer: http.Server; server: ApolloServer<MyContext> }> {
     const typeDefs = readFileSync('schema.graphql', 'utf-8')
 
+    const appDataSource = await AppDataSource.initialize()
+
     const app = express() as any
 
     const httpServer = http.createServer(app)
 
+    const io = new Server(httpServer)
+
+    io.on('connection', (socket) => {
+      app.request.socketIo = socket
+    })
+
     const server = new ApolloServer({
       typeDefs,
       resolvers: this.resolvers,
-      context: ({ req, res }) => {
+      context: async ({ req, res }) => {
         if (!req.headers.authorization) {
           return {
             currentUser: null,
@@ -37,6 +48,19 @@ export class AppModule {
         }
 
         const payload = jwt.verify(req.headers.authorization, JWT_SECRET) as JwtPayload
+
+        if (typeof payload !== 'string' && payload) {
+          const rooms = await appDataSource.manager
+            .getRepository(Room)
+            .createQueryBuilder('room')
+            .innerJoin('room.users', 'user')
+            .where('user.id = :id', { id: payload.id })
+            .getMany()
+
+          const roomIds = rooms.map((room) => room.id.toString())
+
+          req.socketIo?.join(roomIds)
+        }
 
         return {
           currentUser: payload,
