@@ -1,4 +1,9 @@
 # generated schema - do not edit #
+input CreateRoomInput {
+  users: [User!]!
+  messages: [Message!]!
+}
+
 type Message {
   from: Int!
   content: String!
@@ -37,6 +42,7 @@ type User {
   username: String!
   email: String!
   password: String
+  rooms: [Room]
 }
 
 type AuthResponse {

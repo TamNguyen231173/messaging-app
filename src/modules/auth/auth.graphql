@@ -16,6 +16,7 @@ type User {
   username: String!
   email: String!
   password: String
+  rooms: [Room]
 }
 
 type AuthResponse {

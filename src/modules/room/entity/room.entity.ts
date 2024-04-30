@@ -1,5 +1,5 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
-import { User } from '../auth/user/entity/user.entity'
+import { User } from '../../auth/user/entity/user.entity'
 import { Message } from '~/__generated__/resolvers-types'
 
 @Entity()
@@ -13,5 +13,5 @@ export class Room {
   users: User[]
 
   @Column('jsonb', { nullable: false })
-  message: Message[]
+  messages: Message[]
 }

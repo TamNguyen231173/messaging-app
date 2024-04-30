@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm'
-import { Room } from '~/modules/room/room.entity'
+import { Room } from '~/modules/room/entity/room.entity'
 
 @Entity()
 export class User {
