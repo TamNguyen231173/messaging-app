@@ -1,3 +1,4 @@
+import { IsEmail, MinLength } from 'class-validator'
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm'
 import { Room } from '~/modules/room/entity/room.entity'
 
@@ -10,9 +11,11 @@ export class User {
   username: string
 
   @Column({ unique: true })
+  @IsEmail()
   email: string
 
   @Column({ select: false })
+  @MinLength(6)
   password!: string
 
   @ManyToMany(() => Room)

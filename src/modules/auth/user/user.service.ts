@@ -4,6 +4,7 @@ import { RegisterInput } from '~/__generated__/resolvers-types'
 import bcrypt from 'bcrypt'
 import { AppDataSource } from '~/app-data.source'
 import { GraphQLError } from 'graphql'
+import { ValidationError, validateOrReject } from 'class-validator'
 
 class UserService {
   constructor(public userRepository: Repository<User>) {}
@@ -14,12 +15,18 @@ class UserService {
       throw new GraphQLError('Email already exists')
     }
 
-    const password = await bcrypt.hash(registerInput.password, 10)
-    const user = this.userRepository.create({ ...registerInput, password })
+    const user = this.userRepository.create({ ...registerInput })
 
-    await this.userRepository.save(user)
+    return validateOrReject(user)
+      .then(async () => {
+        const password = await bcrypt.hash(registerInput.password, 10)
+        user.password = password
 
-    return user
+        return await this.userRepository.save(user)
+      })
+      .catch((errors: ValidationError[]) => {
+        throw new GraphQLError(errors.toString())
+      })
   }
 
   async findOneByEmail(email: string) {
