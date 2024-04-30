@@ -1,7 +1,12 @@
 # generated schema - do not edit #
 input CreateRoomInput {
-  users: [User!]!
-  messages: [Message!]!
+  message: String!
+  users: [Int!]!
+}
+
+input SendMessageInput {
+  message: String!
+  roomId: Int!
 }
 
 type Message {
@@ -15,13 +20,9 @@ type Room {
   messages: [Message]
 }
 
-input SendMessageInput {
-  message: String!
-  roomId: Int!
-}
-
 type Mutation {
   sendMessage(input: SendMessageInput!): Room
+  createRoom(input: CreateRoomInput!): Room
   register(input: RegisterInput!): AuthResponse!
   login(input: LoginInput!): AuthResponse!
 }

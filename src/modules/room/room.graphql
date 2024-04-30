@@ -1,3 +1,13 @@
+input CreateRoomInput {
+  message: String!
+  users: [Int!]!
+}
+
+input SendMessageInput {
+  message: String!
+  roomId: Int!
+}
+
 type Message {
   from: Int!
   content: String!
@@ -9,11 +19,7 @@ type Room {
   messages: [Message]
 }
 
-input SendMessageInput {
-  message: String!
-  roomId: Int!
-}
-
 type Mutation {
   sendMessage(input: SendMessageInput!): Room
+  createRoom(input: CreateRoomInput!): Room
 }

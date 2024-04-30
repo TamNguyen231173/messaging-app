@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm'
+import { In, Repository } from 'typeorm'
 import { User } from './entity/user.entity'
 import { RegisterInput } from '~/__generated__/resolvers-types'
 import bcrypt from 'bcrypt'
@@ -31,6 +31,18 @@ class UserService {
       .getOne()
 
     return user
+  }
+
+  async findOneById(id: number) {
+    const user = await this.userRepository.findOne({
+      where: { id }
+    })
+    return user
+  }
+
+  async findByIds(ids: number[]) {
+    const users = await this.userRepository.findBy({ id: In(ids) })
+    return users
   }
 }
 
