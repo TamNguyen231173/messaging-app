@@ -27,6 +27,11 @@ type Mutation {
   login(input: LoginInput!): AuthResponse!
 }
 
+type Query {
+  getRooms: [Room]
+  currentUser: JwtPayload
+}
+
 input RegisterInput {
   username: String!
   email: String!
@@ -55,10 +60,6 @@ type AuthResponse {
 type JwtPayload {
   id: Int!
   email: String!
-}
-
-type Query {
-  currentUser: JwtPayload
 }
 
 schema {

@@ -34,5 +34,15 @@ export const roomResolvers: Resolvers = {
 
       return room
     }
+  },
+
+  Query: {
+    async getRooms(parent, args, context): Promise<Room[]> {
+      if (!context.authorized) throw new GraphQLError('Unauthorized')
+
+      const rooms = await roomService.getAllRooms(context.currentUser.id)
+
+      return rooms
+    }
   }
 }

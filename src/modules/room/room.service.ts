@@ -46,6 +46,18 @@ class RoomService {
 
     return !!rooms?.some((room) => room.users.some((user) => user.id === receiverId))
   }
+
+  async getAllRooms(userId: number) {
+    const queryBuilder = this.roomRepository.createQueryBuilder('room')
+
+    const rooms = await queryBuilder
+      .select()
+      .innerJoin('room.users', 'users')
+      .where('users.id = :userId', { userId })
+      .getMany()
+
+    return rooms
+  }
 }
 
 export const roomService = new RoomService(AppDataSource.getRepository(Room))
